@@ -8,16 +8,27 @@
 import UIKit
 
 class MainViewController: UIViewController {
- 
-    
-//MARK: - Properties
-    
-    var dateValue = ""
-    var textFieldValue = ""
-    var type = "trivia"
     
     
-//MARK: - IBOutlets
+    //MARK: - Private Properties
+    
+    private var urlValue = ""
+    private var numberFacts: NumberFacts?
+    private var dateValue = ""
+    private var textFieldValue = ""
+    private var type = "trivia"
+    
+    private var urlName: String {
+        get {
+            "http://numbersapi.com/\(urlValue)/\(type)?json"
+        }
+    }
+    
+    
+    
+    
+    
+    //MARK: - IBOutlets
     
     @IBOutlet weak var datePicker: UIDatePicker!
     @IBOutlet weak var textField: UITextField!
@@ -31,6 +42,8 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        
         hideKeyboard()
         addDoneButton()
         
@@ -38,20 +51,19 @@ class MainViewController: UIViewController {
         textField.isHidden = false
     }
     
-//MARK: - IBActions
+    //MARK: - IBActions
     
     @IBAction func getButtonPressed(_ sender: Any) {
         
-        if textField.text != "" {
-            fetchFact()
-        } else if datePicker.isHidden == false {
-            fetchFact()
+        
+        if textField.text != "" || datePicker.isHidden == false {
+            fetchData()
         } else {
             alertNotification(title: "Error!", message: "Type some number")
         }
     }
     
-//MARK: - Data Transfer
+    //MARK: - Data Transfer
     
     @IBAction func unwindDate(for segue: UIStoryboardSegue) {
         guard let mainVC = segue.destination as? MainViewController else { return }
@@ -61,6 +73,7 @@ class MainViewController: UIViewController {
         mainVC.titleLabel.text = "Enter some date (Year doesn't matter)"
         mainVC.textField.text = ""
         mainVC.infoLabel.text = "Information about"
+        mainVC.factLabel.text = ""
         
     }
     
@@ -93,9 +106,8 @@ class MainViewController: UIViewController {
 //MARK: - Networking (Need move to NetworkManager)
 
 extension MainViewController {
-    func fetchFact() {
-        
-        var urlValue = ""
+    
+    private func fetchData() {
         
         if datePicker.isHidden == true {
             textFieldValue = textField.text ?? ""
@@ -105,43 +117,30 @@ extension MainViewController {
             urlValue = dateValue
         }
         
-        let url = "http://numbersapi.com/\(urlValue)/\(type)?json"
         
-        guard let url = URL(string: url) else { return }
         
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data = data else {
-                print(error?.localizedDescription ?? "No description")
-                return
-            }
+        NetworkManager.shared.fetchData(from: urlName) { numberAndFacts in
+            self.numberFacts = numberAndFacts
             
-            do {
-                let someInfo = try JSONDecoder().decode(NumberFacts.self, from: data)
-                print(someInfo.text ?? "Erro. No text")
+            DispatchQueue.main.async {
+                self.factLabel.text = self.numberFacts?.text
                 
-                DispatchQueue.main.async {
-                    self.factLabel.text = someInfo.text
-                    
-                    if self.datePicker.isHidden == true {
-                        self.infoLabel.text = "A \(someInfo.type ?? "") fact for \(String(someInfo.number ?? 0))"
-                    } else {
-                        self.infoLabel.text = "A \(someInfo.type ?? "") fact for \(self.dateValue)/\(String(someInfo.year ?? 0))"
-                    }
+                if self.datePicker.isHidden == true {
+                    self.infoLabel.text = "A \(numberAndFacts.type ?? "") fact for \(String(numberAndFacts.number ?? 0))"
+                } else {
+                    self.infoLabel.text = "A \(numberAndFacts.type ?? "") fact for \(self.dateValue)/\(String(numberAndFacts.year ?? 0))"
                 }
-                
-            } catch let error {
-                print(error)
             }
             
-        }.resume()
-        
+        }
         
     }
+    
 }
 
 // MARK: - keyboard settings
 extension MainViewController {
-    func hideKeyboard() {
+    private func hideKeyboard() {
         let tapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(tapGesture)
     }
@@ -166,7 +165,7 @@ extension MainViewController {
 //MARK: - Extentions
 
 extension MainViewController {
-    func clearView(){
+    private func clearView(){
         datePicker.isHidden = true
         textField.isHidden = false
         factLabel.text = ""
@@ -174,7 +173,7 @@ extension MainViewController {
         textField.text = ""
     }
     
-    func getDate() {
+    private func getDate() {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.day,.month], from: self.datePicker.date)
         if let day = components.day, let month = components.month{
@@ -185,7 +184,7 @@ extension MainViewController {
         }
     }
     
-    func alertNotification(title: String, message: String) {
+    private func alertNotification(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         present(alert, animated: true)
         let okAction = UIAlertAction(title: "ok", style: .cancel)

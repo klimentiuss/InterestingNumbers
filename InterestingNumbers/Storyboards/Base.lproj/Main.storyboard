@@ -36,7 +36,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="getButtonPres:" destination="BYZ-38-t0r" eventType="touchUpInside" id="nz1-VQ-0BQ"/>
+                                    <action selector="getButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="4X8-K7-8cM"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enter your number:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="PqS-lc-Qeb">
@@ -162,7 +162,6 @@
                                     <fontDescription key="titleFontDescription" type="system" pointSize="30"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="triviaButton:" destination="RQM-Vz-2lO" eventType="touchUpInside" id="Qoe-94-9KO"/>
                                     <segue destination="yIn-9M-AEx" kind="unwind" unwindAction="unwindTriviaFor:" id="gZj-TU-xnf"/>
                                 </connections>
                             </button>
@@ -179,7 +178,6 @@
                                     <fontDescription key="titleFontDescription" type="system" pointSize="30"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="mathButton:" destination="RQM-Vz-2lO" eventType="touchUpInside" id="sav-ad-Na1"/>
                                     <segue destination="yIn-9M-AEx" kind="unwind" unwindAction="unwindMathFor:" id="a2l-a8-RyG"/>
                                 </connections>
                             </button>
@@ -212,7 +210,6 @@
                                     <fontDescription key="titleFontDescription" type="system" pointSize="30"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="yearButton:" destination="RQM-Vz-2lO" eventType="touchUpInside" id="ocH-PR-70k"/>
                                     <segue destination="yIn-9M-AEx" kind="unwind" unwindAction="unwindYearFor:" id="MgZ-87-xOk"/>
                                 </connections>
                             </button>
